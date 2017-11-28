@@ -1,0 +1,32 @@
+﻿Build started 11/27/2017 2:51:27 PM.
+     1>Project "C:\Users\mtunderwood\Documents\Github\Assembly-Proj-2\midi-like\midi-like\midi-like.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I"C:\Users\mtunderwood\Documents\SFML-2.4.2\include" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\player.cpp
+         player.cpp
+     1>c:\program files (x86)\microsoft visual studio 14.0\vc\include\tuple(75): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+         c:\program files (x86)\microsoft visual studio 14.0\vc\include\tuple(257): note: see reference to function template instantiation 'std::_Tuple_val<_This>::_Tuple_val<_Ty>(_Other &&)' being compiled
+                 with
+                 [
+                     _This=float,
+                     _Ty=double,
+                     _Other=double
+                 ]
+         c:\program files (x86)\microsoft visual studio 14.0\vc\include\tuple(257): note: see reference to function template instantiation 'std::_Tuple_val<_This>::_Tuple_val<_Ty>(_Other &&)' being compiled
+                 with
+                 [
+                     _This=float,
+                     _Ty=double,
+                     _Other=double
+                 ]
+         c:\program files (x86)\microsoft visual studio 14.0\vc\include\tuple(257): note: see reference to function template instantiation 'std::tuple<float,sf::Sound>::tuple<double,sf::Sound,std::_Tuple_enable<std::tuple<>,std::tuple<>>::type>(std::tuple<double,sf::Sound> &&)' being compiled
+         c:\program files (x86)\microsoft visual studio 14.0\vc\include\tuple(257): note: see reference to function template instantiation 'std::tuple<float,sf::Sound>::tuple<double,sf::Sound,std::_Tuple_enable<std::tuple<>,std::tuple<>>::type>(std::tuple<double,sf::Sound> &&)' being compiled
+         c:\users\mtunderwood\documents\github\assembly-proj-2\player.cpp(144): note: see reference to function template instantiation 'std::tuple<size_t,float,sf::Sound>::tuple<int,double,sf::Sound,std::_Tuple_enable<std::tuple<>,std::tuple<>>::type>(std::tuple<int,double,sf::Sound> &&)' being compiled
+         c:\users\mtunderwood\documents\github\assembly-proj-2\player.cpp(144): note: see reference to function template instantiation 'std::tuple<size_t,float,sf::Sound>::tuple<int,double,sf::Sound,std::_Tuple_enable<std::tuple<>,std::tuple<>>::type>(std::tuple<int,double,sf::Sound> &&)' being compiled
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\mtunderwood\Documents\Github\Assembly-Proj-2\midi-like\Debug\midi-like.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\mtunderwood\Documents\SFML-2.4.2\lib" "sfml-audio-d.lib" "sfml-system-d.lib" openal32.lib flac.lib vorbisenc.lib vorbisfile.lib vorbis.lib ogg.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\mtunderwood\Documents\Github\Assembly-Proj-2\midi-like\Debug\midi-like.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\mtunderwood\Documents\Github\Assembly-Proj-2\midi-like\Debug\midi-like.lib" /MACHINE:X86 Debug\player.obj
+         midi-like.vcxproj -> C:\Users\mtunderwood\Documents\Github\Assembly-Proj-2\midi-like\Debug\midi-like.exe
+     1>Done Building Project "C:\Users\mtunderwood\Documents\Github\Assembly-Proj-2\midi-like\midi-like\midi-like.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.05

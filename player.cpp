@@ -132,7 +132,6 @@ void parseAction(std::tuple<size_t, float, sf::Sound> & songEvent, bufferMapType
 
 void playTrack(std::string line, float bpm)
 {							
-	std::mutex lock;
 	bufferMapType soundBuffers;
 
 	sf::Sound dummy;
@@ -184,23 +183,30 @@ void playSong(std::string filename, float bpm)
 
 	std::thread one(playTrack, songTracks[0], bpm);
 	std::thread two(playTrack, songTracks[1], bpm);
-	//std::thread three(playTrack, songTracks[2], bpm);
+	std::thread three(playTrack, songTracks[2], bpm);
 
 	one.join();
 	two.join();
-	//three.join();
+	three.join();
 }
 
-void test(std::tuple<size_t, float, sf::Sound> & songEvent, bufferMapType & noteBuffers)
+void testFunc(sf::SoundBuffer & buffer)
 {
-
-	std::get<2>(songEvent).setBuffer(noteBuffers["A"]);
+	buffer.loadFromFile("Instruments\\Rhythm\\hihat-plain.wav");
 }
 
 int main()
 {
 
 	playSong("mary-had-a-little-lamb.txt", 120);
+
+	//sf::SoundBuffer test2;
+	//std::thread t(testFunc, test2);
+	//
+	//sf::SoundBuffer test;
+	//test.loadFromFile("Instruments\\Rhythm\\kick-electro02.wav");
+	//t.join();
+	
 
 	std::cout << "Press ENTER to exit";
 	while(std::cin.get() != '\n') 

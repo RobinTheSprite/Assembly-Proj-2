@@ -1,0 +1,8 @@
+
+*.dll
+*.sln
+*.sdf
+*.opensdf
+*.filters
+*.vcxproj
+midi-like/.vs/midi-like/v14/.suo
