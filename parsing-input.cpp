@@ -6,6 +6,8 @@ Contains functions for creating music instructions for use in player.cpp
 
 #include "parsing-input.h"
 #include <map>
+#include <iostream>
+#include <exception>
 #include <SFML\Audio.hpp>
 
 using bufferMapType = std::map<std::string, sf::SoundBuffer>;
@@ -65,7 +67,17 @@ void parseAction(std::tuple<size_t, float, sf::Sound> & songEvent, bufferMapType
 		return;
 	}
 
-	std::string noteType = instruction.substr(2, std::string::npos);
+	std::string noteType;
+	try
+	{
+		noteType = instruction.substr(2, std::string::npos);
+	}
+	catch (std::exception & e)
+	{
+		std::cout << "Exception: " << e.what() << std::endl;
+		std::cout << "String: " << instruction << std::endl;
+	}
+
 	if (noteType == "R")
 	{
 		std::get<0>(songEvent) = 1;

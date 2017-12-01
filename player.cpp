@@ -27,16 +27,7 @@ void playSound(sf::Sound sound, float secs)
 
 	if (secs != -1)
 	{
-		while (clock.getElapsedTime() < sf::seconds(secs))
-		{
-			//if (clock.getElapsedTime() > sf::seconds(secs - 2))
-			//{
-			//	for (size_t i = 1000000000; i < 0; --i)
-			//	{
-			//		sound.setVolume(i / 10000000);
-			//	}
-			//}
-		}
+		while (clock.getElapsedTime() < sf::seconds(secs)){}
 	}
 	else
 	{
@@ -68,7 +59,6 @@ void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm)
 			parseAction(songEvent, soundBuffers, instruction, bpm);
 			track.push_back(songEvent);
 		}
-		
 	}
 
 	std::vector < std::function<void(sf::Sound, float)> > action = { rest, playSound };
@@ -79,8 +69,23 @@ void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm)
 	}
 }
 
+bool checkExtension(std::string & filename)
+{
+	std::string ext;
+	for (auto it = (filename.end() - 1); it > (filename.end() - 4); --it)
+	{
+		ext += *it;
+	}
+	return (ext == "lm.");
+}
+
 void playSong(std::string filename, float bpm)
 {
+	if (!checkExtension(filename))
+	{
+		std::cout << "File Extension Incorrect" << std::endl;
+		return;
+	}
 	std::vector<std::string> songTracks;
 	std::vector<bufferMapType> soundsForEachTrack;
 	
@@ -107,7 +112,7 @@ void playSong(std::string filename, float bpm)
 
 int main()
 {
-	playSong("mary-had-a-little-lamb.txt", 120);
+	playSong("codebreaker.ml", 120);
 
 	std::cout << "Press ENTER to exit";
 	while(std::cin.get() != '\n') 
