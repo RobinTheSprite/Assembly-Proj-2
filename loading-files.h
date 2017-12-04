@@ -13,8 +13,9 @@ Contains function declarations for loading-files.cpp
 #include <map>
 
 sf::SoundBuffer getWavFile(std::string filename);
-std::map<std::string, sf::SoundBuffer> getNotes(std::string fileLocation);
-std::map<std::string, sf::SoundBuffer> getSongSounds(std::string & track);
+std::map<std::string, sf::SoundBuffer> getNotes(std::string);
+std::map<std::string, sf::SoundBuffer> getSongSounds(std::string &);
+void assignBuffers(std::string &, std::vector<std::string> &, std::vector<std::map<std::string, sf::SoundBuffer>> &);
 
 #endif // !FILE_LOADINGFILES_H_INCLUDED
 

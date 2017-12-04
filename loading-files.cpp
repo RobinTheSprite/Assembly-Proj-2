@@ -15,12 +15,26 @@ Contains functions for getting instrument sounds for player.cpp
 
 using bufferMapType = std::map<std::string, sf::SoundBuffer>;
 
+void assignBuffers(std::string & filename, std::vector<std::string> & songTracks, std::vector<bufferMapType> & buffersForEachTrack)
+{
+	std::ifstream songfile(filename);
+	std::string line;
+	while (std::getline(songfile, line))
+	{
+		if (line[0] != '!')
+		{
+			songTracks.push_back(line);
+			buffersForEachTrack.push_back(getSongSounds(songTracks.back()));
+		}
+	}
+}
+
 sf::SoundBuffer getWavFile(std::string filename)
 {
 	filename += ".wav";
 	sf::SoundBuffer toBeReturned;
 	if (!toBeReturned.loadFromFile(filename))
-		std::cout << "File " << filename << ".wav " << "not available." << std::endl;
+		std::cout << "ERROR: File " << filename << " not available." << std::endl;
 
 	return toBeReturned;
 }
@@ -30,8 +44,12 @@ bufferMapType getNotes(std::string fileLocation)
 	bufferMapType notes;
 
 	std::ifstream names(fileLocation + "names.txt");
-	std::string line;
+	if (!names)
+	{
+		std::cout << "ERROR: names.txt for filepath " << fileLocation << " is missing or unavailable" << std::endl;
+	}
 
+	std::string line;
 	while (std::getline(names, line))
 	{
 		std::string filename = fileLocation;
@@ -59,6 +77,11 @@ bufferMapType getSongSounds(std::string & track)
 	{
 		soundBuffers = getNotes("Instruments\\" + instrument.substr(3, std::string::npos) + "\\");
 	}
+	else
+	{
+		std::cout << "ERROR: \"" << instrument << "\" not a valid instrument" << std::endl;
+	}
 
+	track = track.substr(instrument.size(), std::string::npos);
 	return soundBuffers;
 }
