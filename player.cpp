@@ -5,6 +5,7 @@ Plays a song using instructions from a text file
 */
 
 #include <thread>
+#include <mutex>
 #include <vector>
 #include <map>
 #include <tuple>
@@ -18,10 +19,48 @@ Plays a song using instructions from a text file
 #include "loading-files.h"
 #include "track.h"
 
+//Class my_barrier by UmNyobe at 
+//https://stackoverflow.com/questions/38999911/what-is-the-best-way-to-realize-a-synchronization-barrier-between-threads
+class my_barrier
+{
+
+public:
+	my_barrier(int count)
+		: thread_count(count)
+		, counter(0)
+		, waiting(0)
+	{}
+
+	void wait()
+	{
+		//fence mechanism
+		std::unique_lock<std::mutex> lk(m);
+		++counter;
+		++waiting;
+		cv.wait(lk, [&] {return counter >= thread_count; });
+		--waiting;
+		if (waiting == 0)
+		{
+			//reset barrier
+			counter = 0;
+		}
+		lk.unlock();
+	}
+
+private:
+	std::mutex m;
+	std::condition_variable cv;
+	int counter;
+	int waiting;
+	int thread_count;
+};
+
+
+
 using bufferMapType = std::map<std::string, sf::SoundBuffer>;
 sf::Clock sync;
 
-void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm)
+void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm, my_barrier & barrier)
 {							
 	sf::Sound dummy;
 	Track track(bpm);
@@ -36,7 +75,7 @@ void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm)
 		track.insert(songEvent);
 	}
 
-	while (sync.getElapsedTime() < sf::seconds(1)) {}
+	barrier.wait();
 	track.play();
 }
 
@@ -62,11 +101,13 @@ void playSong(std::string filename, float bpm)
 	
 	assignBuffers(filename, songTracks, buffersForEachTrack);
 
-	std::vector<std::thread> allThreads(songTracks.size());
+	std::vector <std::thread> allThreads(songTracks.size());
+
+	my_barrier barrier(allThreads.size());
 
 	for (size_t i = 0; i < songTracks.size(); ++i)
 	{
-		allThreads[i] = std::thread(playTrack, songTracks[i], buffersForEachTrack[i], bpm);
+		allThreads[i] = std::thread(playTrack, songTracks[i], buffersForEachTrack[i], bpm, barrier);
 	}
 	
 	for (size_t i = 0; i < songTracks.size(); ++i)
@@ -140,7 +181,7 @@ int main()
 
 			if (onEnter && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				playSong("immigrantsong.ml", 112);
+				playSong("mary-had-a-little-lamb.ml", 112);
 			}
 		}
 
