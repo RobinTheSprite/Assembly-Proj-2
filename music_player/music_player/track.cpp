@@ -1,7 +1,6 @@
 
 #include <functional>
 #include <iostream>
-#include <atomic>
 #include <SFML\Audio.hpp>
 #include "track.h"
 
@@ -16,44 +15,66 @@ Track::Track(float bpm)
 	_sixteenthNote = _quarterNote / 4.0f;
 }
 
-void Track::play(sf::Clock & sync)
+void playSound(sf::Sound sound, float secs)
 {
-	for (auto & t : _track)
+	sound.play();
+	sf::Clock clock;
+
+	if (secs != -1)
 	{
-		if (std::get<0>(t) == 1)
-		{
-			std::get<2>(t).play();
-		}
-		while (sync.getElapsedTime() < sf::seconds(std::get<1>(t))) {}
-		std::get<2>(t).stop();
+		while (clock.getElapsedTime() < sf::seconds(secs)) {}
+	}
+	else
+	{
+		while (sound.getStatus() == sf::Sound::Playing) {}
+	}
+
+	sound.stop();
+}
+
+void rest(sf::Sound dummy, float secs)
+{
+	sf::Clock clock;
+	while (clock.getElapsedTime() < sf::seconds(secs)) {}
+}
+
+void Track::play()
+{
+	std::vector < std::function<void(sf::Sound, float)> > action = { rest, playSound };
+	for (auto t : _track)
+	{
+		action[std::get<0>(t)](std::get<2>(t), std::get<1>(t));
 	}
 }
 
 void Track::parseAction(std::tuple<size_t, float, sf::Sound> & songEvent, bufferMapType & buffers,
 					   std::string & instruction)
 {
-	if (instruction.substr(0, 2) == "01")
+	if (instruction.substr(0, 2) == "00")
 	{
-		_timeDistance += _wholeNote;
+		std::get<1>(songEvent) = -1;
+	}
+	else if (instruction.substr(0, 2) == "01")
+	{
+		std::get<1>(songEvent) = _wholeNote;
 	}
 	else if (instruction.substr(0, 2) == "02")
 	{
-		_timeDistance += _halfNote;
+		std::get<1>(songEvent) = _halfNote;
 	}
 	else if (instruction.substr(0, 2) == "04")
 	{
-		_timeDistance += _quarterNote;
+		std::get<1>(songEvent) = _quarterNote;
 	}
 	else if (instruction.substr(0, 2) == "08")
 	{
-		_timeDistance += _eighthNote;
+		std::get<1>(songEvent) = _eighthNote;
 	}
 	else if (instruction.substr(0, 2) == "16")
 	{
-		_timeDistance += _sixteenthNote;
+		std::get<1>(songEvent) = _sixteenthNote;
 	}
-	std::get<1>(songEvent) = _timeDistance;
-
+	
 	std::string noteType;
 	try
 	{
@@ -85,7 +106,7 @@ void Track::parseAction(std::tuple<size_t, float, sf::Sound> & songEvent, buffer
 	}
 }
 
-void Track::push_back(std::tuple<size_t, float, sf::Sound> & songEvent)
+void Track::insert(std::tuple<size_t, float, sf::Sound> & songEvent)
 {
 	_track.push_back(songEvent);
 }

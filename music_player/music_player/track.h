@@ -13,19 +13,20 @@ public:
 	Track();
 	Track(float bpm);
 
-	void play(sf::Clock &);
+	void play();
 	void parseAction(std::tuple<size_t, float, sf::Sound> & songEvent, bufferMapType & buffers,
 					 std::string & instruction);
-	void push_back(std::tuple<size_t, float, sf::Sound> &);
+	void insert(std::tuple<size_t, float, sf::Sound> &);
 
 private:
+	void _playSound(sf::Sound sound, float secs);
+	void _rest(sf::Sound dummy, float secs);
 
 	float _wholeNote;
 	float _halfNote;
 	float _quarterNote;
 	float _eighthNote;
 	float _sixteenthNote;
-	float _timeDistance;
 	std::vector<std::tuple<size_t, float, sf::Sound>> _track;
 };
 

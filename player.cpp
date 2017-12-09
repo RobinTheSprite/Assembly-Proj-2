@@ -13,70 +13,35 @@ Plays a song using instructions from a text file
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <atomic>
 #include <SFML\Audio.hpp>
 #include <SFML\Window.hpp>
 #include <SFML\Graphics.hpp>
 #include "loading-files.h"
 #include "track.h"
 
-//Class my_barrier by UmNyobe at 
-//https://stackoverflow.com/questions/38999911/what-is-the-best-way-to-realize-a-synchronization-barrier-between-threads
-class my_barrier
-{
-
-public:
-	my_barrier(int count)
-		: thread_count(count)
-		, counter(0)
-		, waiting(0)
-	{}
-
-	void wait()
-	{
-		//fence mechanism
-		std::unique_lock<std::mutex> lk(m);
-		++counter;
-		++waiting;
-		cv.wait(lk, [&] {return counter >= thread_count; });
-		--waiting;
-		if (waiting == 0)
-		{
-			//reset barrier
-			counter = 0;
-		}
-		lk.unlock();
-	}
-
-private:
-	std::mutex m;
-	std::condition_variable cv;
-	int counter;
-	int waiting;
-	int thread_count;
-};
-
-
-
 using bufferMapType = std::map<std::string, sf::SoundBuffer>;
-sf::Clock sync;
+std::atomic<int> barrier;
 
-void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm, my_barrier & barrier)
-{							
+void playTrack(std::string & line, bufferMapType & soundBuffers, float bpm, sf::Clock & sync)
+{
 	sf::Sound dummy;
 	Track track(bpm);
-	
+
 	std::istringstream iss(line);
 	std::string instruction;
 	while (iss >> instruction)
 	{
 		std::tuple<size_t, float, sf::Sound> songEvent = std::make_tuple(0, 0.0, dummy);
-	
+
 		track.parseAction(songEvent, soundBuffers, instruction);
-		track.insert(songEvent);
+		track.push_back(songEvent);
 	}
 
-	barrier.wait();
-	track.play();
+	--barrier;
+	while (barrier != 0) {}
+	sync.restart();
+	track.play(sync);
 }
 
 bool checkExtension(std::string & filename)
@@ -103,11 +68,12 @@ void playSong(std::string filename, float bpm)
 
 	std::vector <std::thread> allThreads(songTracks.size());
 
-	my_barrier barrier(allThreads.size());
+	barrier = allThreads.size();
 
+	sf::Clock sync;
 	for (size_t i = 0; i < songTracks.size(); ++i)
 	{
-		allThreads[i] = std::thread(playTrack, songTracks[i], buffersForEachTrack[i], bpm, barrier);
+		allThreads[i] = std::thread(playTrack, songTracks[i], buffersForEachTrack[i], bpm, sync);
 	}
 	
 	for (size_t i = 0; i < songTracks.size(); ++i)
@@ -141,13 +107,14 @@ int main()
 	textBox.setOutlineThickness(2);
 	textBox.setOutlineColor(sf::Color(200, 200, 200, 255));
 
-	sf::Text pipe;
-	pipe.setFont(times);
-	pipe.setFillColor(sf::Color::Black);
-	pipe.setPosition(80, 280);
-	pipe.setString("|");
+	sf::Text inputArea;
+	inputArea.setFont(times);
+	inputArea.setFillColor(sf::Color::Black);
+	inputArea.setPosition(80, 280);
 	int pipeDistance = 80;
 	sf::Clock blinkPipe;
+
+	std::string input = "_";
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "MIDI-Like Music Player");
 	while (window.isOpen())
@@ -174,14 +141,14 @@ int main()
 
 			if (event.type == sf::Event::TextEntered)
 			{
-				blinkPipe.restart();
-				pipeDistance += pipe.getCharacterSize();
-				pipe.setPosition(sf::Vector2f(pipeDistance, 280));
+				input.pop_back();
+				input += event.text.unicode;
+				input.push_back('_');
 			}
 
 			if (onEnter && sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-				playSong("mary-had-a-little-lamb.ml", 112);
+				playSong("immigrantsong.ml", 112);
 			}
 		}
 
@@ -191,25 +158,15 @@ int main()
 
 		window.draw(textBox);
 
+		inputArea.setString(input);
+		window.draw(inputArea);
+
 		sf::Text enterLabel;
 		enterLabel.setFont(impact);
 		enterLabel.setFillColor(sf::Color::Black);
 		enterLabel.setPosition(568, 283);
 		enterLabel.setString("Play");
 		window.draw(enterLabel);
-
-		if (blinkPipe.getElapsedTime() < sf::seconds(1))
-		{
-			window.draw(pipe);
-		}
-		else if (blinkPipe.getElapsedTime() > sf::seconds(1) && blinkPipe.getElapsedTime() < sf::seconds(2))
-		{
-
-		}
-		else if (blinkPipe.getElapsedTime() > sf::seconds(2))
-		{
-			blinkPipe.restart();
-		}
 		
 		window.display();
 	}

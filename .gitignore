@@ -6,3 +6,15 @@
 *.filters
 *.vcxproj
 midi-like/.vs/midi-like/v14/.suo
+music_player/.vs/music_player/v14/.suo
+music_player/music_player.VC.db
+music_player/music_player.VC.VC.opendb
+*.ilk
+*.pdb
+*.obj
+*.log
+*.tlog
+*.idb
+music_player/Release/music_player.ipdb
+music_player/Release/music_player.iobj
+music_player/Release/music_player.exe
